@@ -113,14 +113,22 @@ end
 
 ################################## Load function for creating data summary table ########################################
 
-function create_biodiversity_metric_summary_df(rs_filepath, aadpt_dhw_range, n_corals_range;
-    display_years=[2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070], rc_ref=0.70,
+function create_biodiversity_metric_summary_df(rs_filepath;
+    display_years=[2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070],
+    rc_ref=0.70,
+    geom_column=:geometry,
     biodiversity_metric_summary_filename=[]
 )
     # Load result set
     rs = ADRIA.load_results(rs_filepath)
     # Scenario dataframe
     scenario_df = rs.inputs
+    n_corals_range = unique(
+        sum(Array(scenario_df[:, ["N_seed_TA", "N_seed_CA", "N_seed_SM"]]); dims=2)
+    )
+    n_corals_range = n_corals_range[n_corals_range .!= 0.0]
+    aadpt_dhw_range = unique(scenario_df.a_adapt)
+    aadpt_dhw_range = aadpt_dhw_range[aadpt_dhw_range .!= 0.0]
 
     # Calculate metrics for all scenarios
     rc = ADRIA.metrics.relative_cover(rs)
@@ -169,9 +177,9 @@ function create_biodiversity_metric_summary_df(rs_filepath, aadpt_dhw_range, n_c
 
     iv_seed_log = rs.seed_log # Number of corals outplanted for each scenario, timestep, location
 
-    site_geom = rs.loc_data.geom # Site polygon geometry
-    site_lat = ag.gety.(GeoDataFrames.centroid.(site_geom), 0) # Centroid latitude
-    site_long = ag.getx.(GeoDataFrames.centroid.(site_geom), 0) # Centroid longitude
+    site_geom = rs.loc_data[:, geom_column] # Site polygon geometry
+    site_lat = ag.gety.(ag.centroid.(site_geom), 0) # Centroid latitude
+    site_long = ag.getx.(ag.centroid.(site_geom), 0) # Centroid longitude
 
     for yr in display_years # For each year included in the table
         # Find indices for yr, cf scenarios
@@ -223,8 +231,8 @@ function create_biodiversity_metric_summary_df(rs_filepath, aadpt_dhw_range, n_c
                 )
                 # Get intervention years which are less than or equal to the current year
                 iv_years = collect(
-                    years[Int64(scenario_df.seed_year_start[1])]:years[Int64(
-                        scenario_df.seed_year_start[1] + scenario_df.seed_years[1]
+                    years[Int64(scenario_df.seed_year_start[scen_ids][1])]:years[Int64(
+                        scenario_df.seed_year_start[scen_ids][1] + scenario_df.seed_years[scen_ids][1]
                     )]
                 )
                 yr_scens_log = findall(in.(years, Ref(iv_years[iv_years .<= yr])))
@@ -297,15 +305,8 @@ end
 ###################################### Key filename from ADRIA.jl dataset ###############################################
 
 # Results filepath
-rs_filepath = "path to ADRIA resultset"
-
-####################################### Key scenarios to include in dataframe ###########################################
-
-aadpt_dhw_range = [0, 1, 5, 10, 15, 20] # Adaptation levels to include
-n_corals_range = [200000, 500000, 1000000] # Deployment volumes to include
+rs_filepath = "./Outputs/Moore_2025-03-18_v070_rc1__RCPs_45__2025-07-08_14_21_59_463"
 
 ################################## Create biodiversity metric summary dataframe #########################################
 
-display_scenario_df, bio_metric_sum_fn = create_biodiversity_metric_summary_df(
-    rs_filepath, aadpt_dhw_range, n_corals_range
-)
+display_scenario_df, bio_metric_sum_fn = create_biodiversity_metric_summary_df(rs_filepath)
