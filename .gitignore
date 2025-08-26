@@ -29,3 +29,4 @@ JuliaLocalPreferences.toml
 
 # Ignore outputs generated in ADRIA
 ADRIA.jl runs/Outputs/*
+ADRIA.jl runs/*.csv
