@@ -7,7 +7,6 @@ using CSV
 using DataFrames, YAXArrays, GeoDataFrames
 import ArchGDAL as ag
 using GeoFormatTypes
-using Revise, Infiltrator
 using DimensionalData
 import Statistics as st
 
@@ -70,13 +69,13 @@ function update_scenario_record!(display_scenario_df, rc, rd, sv, scen_count)
     display_scenario_df[idx_scens, "Shelter Volume"] .= st.mean(sv.data; dims=3)[1, :, 1]
     display_scenario_df[idx_scens, "Shelter Volume sd"] .= st.std(sv.data; dims=3)[1, :, 1]
 
-    # Update RCI for selected sites
-    display_scenario_df[idx_scens, "RCI"] .= st.mean(
+    # Update RBCI for selected sites
+    display_scenario_df[idx_scens, "RBCI"] .= st.mean(
         (rc.data + rd.data + sv.data) ./ 3; dims=3
     )[
         1, :, 1
     ]
-    display_scenario_df[idx_scens, "RCI sd"] .= st.std(
+    display_scenario_df[idx_scens, "RBCI sd"] .= st.std(
         (rc.data + rd.data + sv.data) ./ 3; dims=3
     )[
         1, :, 1
@@ -89,16 +88,16 @@ end
 function update_scenario_record!(
     display_scenario_df, rc_iv, rd_iv, sv_iv, rc_cf, rd_cf, sv_cf, scen_count
 )
-    # Caclulate RCI for counterfactual and intervention
-    rci_temp_iv = (rc_iv.data + rd_iv.data + sv_iv.data) ./ 3
-    rci_temp_cf = (rc_cf.data + rd_cf.data + sv_cf.data) ./ 3
+    # Caclulate RBCI for counterfactual and intervention
+    RBCI_temp_iv = (rc_iv.data + rd_iv.data + sv_iv.data) ./ 3
+    RBCI_temp_cf = (rc_cf.data + rd_cf.data + sv_cf.data) ./ 3
     idx_scens = scen_count:(scen_count + length(rc_iv.locations) - 1)
 
-    # Update delta RCI for selected sites
-    display_scenario_df[idx_scens, "RCI uplift mean"] =
-        st.mean(rci_temp_iv; dims=3)[1, :, 1] .- st.mean(rci_temp_cf; dims=3)[1, :, 1]
-    display_scenario_df[idx_scens, "RCI uplift sd"] =
-        st.std(rci_temp_iv; dims=3)[1, :, 1] .- st.std(rci_temp_cf; dims=3)[1, :, 1]
+    # Update delta RBCI for selected sites
+    display_scenario_df[idx_scens, "RBCI uplift mean"] =
+        st.mean(RBCI_temp_iv; dims=3)[1, :, 1] .- st.mean(RBCI_temp_cf; dims=3)[1, :, 1]
+    display_scenario_df[idx_scens, "RBCI uplift sd"] =
+        st.std(RBCI_temp_iv; dims=3)[1, :, 1] .- st.std(RBCI_temp_cf; dims=3)[1, :, 1]
 
     return nothing
 end
@@ -158,13 +157,13 @@ function create_biodiversity_metric_summary_df(rs_filepath;
         "Diversity sd"=>zeros(Float64, (n_scens,)),
         "Shelter Volume"=>zeros(Float64, (n_scens,)),
         "Shelter Volume sd"=>zeros(Float64, (n_scens,)),
-        "RCI"=>zeros(Float64, (n_scens,)),
-        "RCI sd"=>zeros(Float64, (n_scens,)),
-        "RCI uplift mean"=>zeros(Float64, (n_scens,)),
-        "RCI uplift sd"=>zeros(Float64, (n_scens,)),
+        "RBCI"=>zeros(Float64, (n_scens,)),
+        "RBCI sd"=>zeros(Float64, (n_scens,)),
+        "RBCI uplift mean"=>zeros(Float64, (n_scens,)),
+        "RBCI uplift sd"=>zeros(Float64, (n_scens,)),
         "Site habitable area m2"=>zeros(Float64, (n_scens,)),
         "Deployment area m2"=>zeros(Float64, (n_scens,)),
-        "RCI uplift X deployment area m2"=>zeros(Float64, (n_scens,)),
+        "RBCI uplift X deployment area m2"=>zeros(Float64, (n_scens,)),
         "deployment site flag"=>zeros(Float64, (n_scens,)),
         "site lat"=>zeros(Float64, (n_scens,)),
         "site long"=>zeros(Float64, (n_scens,)))
@@ -277,10 +276,10 @@ function create_biodiversity_metric_summary_df(rs_filepath;
         scen_count+=n_selected
     end
 
-    # Add RCI uplift * estimated deployment area to table
-    display_scenario_df[:, "RCI uplift X deployment area m2"] .=
+    # Add RBCI uplift * estimated deployment area to table
+    display_scenario_df[:, "RBCI uplift X deployment area m2"] .=
         display_scenario_df[:, "Deployment area m2"] .*
-        display_scenario_df[:, "RCI uplift mean"]
+        display_scenario_df[:, "RBCI uplift mean"]
 
     # Add deployment site flag (1 if a deployment site, 0 if not)
     display_scenario_df[:, "deployment site flag"] .=
