@@ -296,6 +296,9 @@ function create_biodiversity_metric_summary_df(rs_filepath;
 
     # Write to csv
     CSV.write(biodiversity_metric_summary_filename, display_scenario_df)
+    # Write geometries and reef site IDs to geoJSON
+    site_geom = rs.loc_data[:, [geom_column, :reef_siteid]]
+    GeoDataFrames.write(string(biodiversity_metric_summary_filename[1:end-4], ".geojson"), site_geom; crs=GeoFormatTypes.EPSG(4326), driver="GeoJSON")
 
     # Return dataframe and filename used to save as csv
     return display_scenario_df, biodiversity_metric_summary_filename
@@ -304,7 +307,7 @@ end
 ###################################### Key filename from ADRIA.jl dataset ###############################################
 
 # Results filepath
-rs_filepath = "./Outputs/Moore_2025-03-18_v070_rc1__RCPs_45__2025-07-08_14_21_59_463"
+rs_filepath = "./Outputs/Moore_2025-03-18_v070_rc1__RCPs_45__2025-08-26_11_07_39_264"
 
 ################################## Create biodiversity metric summary dataframe #########################################
 

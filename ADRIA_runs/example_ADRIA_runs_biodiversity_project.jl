@@ -7,7 +7,7 @@ using ADRIA
 using DataFrames, YAXArrays
 
 ############################################ Load ADRIA Domain ##########################################################
-path_to_domain = "domain filepath"
+path_to_domain = "C:\\Users\\rcrocker\\Documents\\Datapackages\\Moore_2025-03-18_v070_rc1"
 # Load ADRIA domain (e.g. Moore)
 dom = ADRIA.load_domain(
     path_to_domain,
