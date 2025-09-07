@@ -1,0 +1,11 @@
+[bathy_data]
+allen_bathy = "./data/moore_account_whole_domain-20240904025042/Bathymetry---composite-depth/bathymetry_0.tif"
+
+[spatial_data]
+allen_spatial = "./data/Great-Barrier-Reef-and-Torres-Strait-20230310013521"
+
+[dhw_data]
+noaa_dhw = "./data/noaa_crw_thermal_history_annual_history_v3.5.nc"
+
+[other_data]
+allen_turbid = "./data/moore_account_whole_domain-20240904025042/Turbidity-2023/turbidity-annual_0.tif"
