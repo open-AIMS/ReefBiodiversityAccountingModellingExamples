@@ -41,8 +41,3 @@ for a set of sites selected as intervention sites in a set of `ADRIA.jl` runs.
 
 Note, the functions in `ReefBiodiversityAccountSetup`require a config file detail where Allen Atlas and NOAA data sets are saved. The structure of this `config.toml` file is detailed in `plot_allen_atlas_data_example.ipynb`.
 
-### pluto_notebook_Moore_example
-This folder contains a Pluto.jl script for an interactive notebook demonstrting spatial plotting and control and impact site selection for a domain around Moore Reef.
-
-Pluto needs to be installed and then launched in the Julia app to open and run the file. The file also needs the same
-`config.toml` file describing data filepaths as decribed in `plot_allen_atlas_data_example.ipynb`.
